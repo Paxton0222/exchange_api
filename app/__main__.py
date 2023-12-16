@@ -31,12 +31,6 @@ def round_up(n, m):
     n = float(n)
     return round(n, m)
 
-def verify_currency(currency: str) -> bool:
-    """
-    驗證是否有支援此貨幣
-    """
-    return currency in currencies
-
 def exchange(target: str, source: str, amount: str) -> float:
     """
     計算貨幣匯率
@@ -65,13 +59,14 @@ async def exchange_api(
     """
     轉換匯率
     """
-    if not verify_currency(source) or not verify_currency(target):
+    if source not in currencies or target not in currencies:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="不支援輸入貨幣"
         )
-    result = add_thousand_comma(exchange(source, target, amount),2)
+    amount = exchange(source, target, amount)
+    amount = add_thousand_comma(amount,2)
     return {
         "msg": "success",
-        "amount": f"${result}"
+        "amount": f"${amount}"
     }
